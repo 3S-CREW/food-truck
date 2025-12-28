@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@apps-in-toss/web-framework':
+        specifier: ^1.6.2
+        version: 1.6.2(44152666622a2d14017a533acaee55b6)
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.2.7)(react@19.2.3)
