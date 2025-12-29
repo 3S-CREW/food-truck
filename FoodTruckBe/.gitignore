@@ -38,3 +38,5 @@ out/
 
 application-local.yml
 docker-compose.local.yml
+
+/db
