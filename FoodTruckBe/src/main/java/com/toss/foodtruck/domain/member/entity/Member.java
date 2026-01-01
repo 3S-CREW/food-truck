@@ -1,4 +1,4 @@
-package com.toss.foodtruck.domain.entity;
+package com.toss.foodtruck.domain.member.entity;
 
 import com.toss.foodtruck.global.common.BaseTimeEntity;
 import com.toss.foodtruck.global.enums.Role;

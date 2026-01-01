@@ -1,6 +1,6 @@
-package com.toss.foodtruck.domain.repository;
+package com.toss.foodtruck.domain.member.repository;
 
-import com.toss.foodtruck.domain.entity.Member;
+import com.toss.foodtruck.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
