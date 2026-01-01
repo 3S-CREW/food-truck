@@ -28,6 +28,7 @@ public enum ResultCode {
     UPDATE_STORE_STATUS_SUCCESS(200, "S005", "영업 상태 및 위치 업데이트에 성공하였습니다."),
     UPDATE_STORE_NOTICE_SUCCESS(200, "S006", "가게 공지 수정에 성공하였습니다."),
     UPDATE_STORE_INFO_SUCCESS(200, "S007", "가게 정보 수정에 성공하였습니다."),
+    GET_MY_STORE_SUCCESS(200, "S007", "내 가게 조회에 성공하였습니다."),
 
     // Menu (MN)
     GET_MENU_LIST_SUCCESS(200, "MN001", "메뉴 목록 조회에 성공하였습니다."),
