@@ -2,6 +2,7 @@ package com.toss.foodtruck.domain.store.controller;
 
 import com.toss.foodtruck.domain.store.dto.StoreRegisterRequestDto;
 import com.toss.foodtruck.domain.store.dto.StoreResponseDto;
+import com.toss.foodtruck.domain.store.dto.StoreUpdateRequestDto;
 import com.toss.foodtruck.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +22,17 @@ public interface StoreController {
 
     @Operation(summary = "내 가게 조회", description = "로그인한 사장님의 가게 정보를 조회합니다.")
     ResponseEntity<ResultResponse<StoreResponseDto>> getMyStore(
+        @Parameter(hidden = true) String memberId
+    );
+
+    @Operation(summary = "가게 정보 수정", description = "가게 이름, 소개, 시간 등을 수정합니다.")
+    ResponseEntity<ResultResponse<StoreResponseDto>> updateStore(
+        @Parameter(hidden = true) String memberId,
+        @RequestBody StoreUpdateRequestDto request
+    );
+
+    @Operation(summary = "영업 시작/종료", description = "가게의 영업 상태를 변경합니다. (Open <-> Closed)")
+    ResponseEntity<ResultResponse<Boolean>> openCloseStore(
         @Parameter(hidden = true) String memberId
     );
 }

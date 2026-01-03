@@ -4,6 +4,7 @@ import com.toss.foodtruck.domain.member.entity.Member;
 import com.toss.foodtruck.domain.member.repository.MemberRepository;
 import com.toss.foodtruck.domain.store.dto.StoreRegisterRequestDto;
 import com.toss.foodtruck.domain.store.dto.StoreResponseDto;
+import com.toss.foodtruck.domain.store.dto.StoreUpdateRequestDto;
 import com.toss.foodtruck.domain.store.entity.Store;
 import com.toss.foodtruck.domain.store.repository.StoreRepository;
 import com.toss.foodtruck.global.enums.Role;
@@ -64,5 +65,37 @@ public class StoreService {
         Store store = storeRepository.findByMemberId(memberId)
                                      .orElseThrow(() -> new RuntimeException("등록된 가게가 없습니다."));
         return StoreResponseDto.from(store);
+    }
+
+    // 가게 정보 수정
+    @Transactional
+    public StoreResponseDto updateStore(Long memberId, StoreUpdateRequestDto request) {
+        Store store = storeRepository.findByMemberId(memberId)
+                                     .orElseThrow(() -> new RuntimeException("내 가게를 찾을 수 없습니다."));
+
+        // 더티 체킹(Dirty Checking)으로 자동 업데이트
+        store.updateStoreInfo(
+            request.getName(),
+            request.getIntroduction(),
+            request.getAddress(),
+            request.getCategory(),
+            request.getOpenTime(),
+            request.getCloseTime()
+        );
+
+        return StoreResponseDto.from(store);
+    }
+
+    // 영업 상태 변경 (오픈/마감 토글)
+    @Transactional
+    public boolean openCloseStore(Long memberId) {
+        Store store = storeRepository.findByMemberId(memberId)
+                                     .orElseThrow(() -> new RuntimeException("내 가게를 찾을 수 없습니다."));
+
+        // 현재 상태의 반대로 변경 (true -> false, false -> true)
+        boolean newStatus = !store.getIsOpen();
+        store.changeStatus(newStatus);
+
+        return newStatus; // 변경된 상태 반환
     }
 }
