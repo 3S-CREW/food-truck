@@ -37,5 +37,8 @@ public class TossResponseDto {
 
         @JsonProperty("phoneNumber")
         private String phoneNumber;
+
+        @JsonProperty("ci")
+        private String ci;
     }
 }
