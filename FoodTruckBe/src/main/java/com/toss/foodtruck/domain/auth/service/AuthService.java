@@ -80,6 +80,7 @@ public class AuthService {
                                  .accountId(tossUser.getAccountId())
                                  .name(tossUser.getName())
                                  .phoneNumber(tossUser.getPhoneNumber())
+                                 .ci(tossUser.getCi())
                                  .role(Role.USER) // 초기 권한 USER
                                  .build();
         return memberRepository.save(newMember);

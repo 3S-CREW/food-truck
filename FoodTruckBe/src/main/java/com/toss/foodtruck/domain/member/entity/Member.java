@@ -26,7 +26,10 @@ public class Member extends BaseTimeEntity {
     private String name; // 홍길동
 
     @Column(name = "phone_number", length = 20)
-    private String phoneNumber; // 01012345678 (선택사항)
+    private String phoneNumber; // 01012345678
+
+    @Column(name = "ci", length = 255) // CI는 길이가 꽤 깁니다. 넉넉하게 잡으세요.
+    private String ci;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
