@@ -1,21 +1,20 @@
-import { Button } from '@toss/tds-mobile';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import EntryPage from '@/pages/Entry';
+import AdminLoginPage from '@/pages/AdminLogin';
 
 const App = () => {
   return (
-    <div
-      style={{
-        flex: 1,
-        padding: '20px',
-        backgroundColor: 'lightblue',
-        height: '100vh',
-      }}
-    >
-      <h1>렌더링 테스트</h1>
+    <BrowserRouter>
+      <Routes>
+        {/* 기본 경로 접속 시 엔트리 페이지로 이동 */}
+        <Route path='/' element={<EntryPage />} />
+        <Route path='/entry' element={<EntryPage />} />
+        <Route path='/admin/login' element={<AdminLoginPage />} />
 
-      <Button style={{ backgroundColor: 'blue', color: 'white' }}>버튼</Button>
-
-      <Button>기본 버튼</Button>
-    </div>
+        {/* 없는 페이지 처리 */}
+        <Route path='*' element={<Navigate to='/entry' replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
