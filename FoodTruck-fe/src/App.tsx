@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import EntryPage from '@/pages/Entry';
 import AdminLoginPage from '@/pages/AdminLogin';
+import TermsPage from '@/pages/Terms';
 
 const App = () => {
   return (
@@ -10,6 +11,7 @@ const App = () => {
         <Route path='/' element={<EntryPage />} />
         <Route path='/entry' element={<EntryPage />} />
         <Route path='/admin/login' element={<AdminLoginPage />} />
+        <Route path='/login/terms' element={<TermsPage />} />
 
         {/* 없는 페이지 처리 */}
         <Route path='*' element={<Navigate to='/entry' replace />} />
