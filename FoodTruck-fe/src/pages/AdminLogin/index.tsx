@@ -1,8 +1,20 @@
 import PageHeader from '@/components/layout/EntryPageHeader';
 import { TextField, Button } from '@toss/tds-mobile';
 import * as S from './style';
+import { useNavigate } from 'react-router-dom';
 
 const AdminLoginPage = () => {
+  const navigate = useNavigate();
+
+  const handleTermsPageClick = () => {
+    navigate('/login/terms');
+  };
+
+  const handleBackPageClick = () => {
+    navigate(-1);
+  };
+
+
   return (
     <S.Container>
       {/* 상단 콘텐츠 영역 */}
@@ -31,10 +43,10 @@ const AdminLoginPage = () => {
         </S.InputGroup>
 
         <S.ButtonGroup>
-          <Button color='primary' variant='fill' style={{ flex: 1 }}>
+          <Button color='primary' variant='fill' style={{ flex: 1 }} onClick={handleTermsPageClick}>
             로그인
           </Button>
-          <Button color='dark' variant='weak' style={{ flex: 1 }}>
+          <Button color='dark' variant='weak' style={{ flex: 1 }} onClick={handleBackPageClick}>
             돌아가기
           </Button>
         </S.ButtonGroup>
