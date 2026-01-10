@@ -11,12 +11,26 @@ export const Container = styled.div`
   background-color: white;
 `;
 
-// 하단 버튼 영역
-export const ButtonWrapper = styled.div`
-  width: 100%;
+// 하단 전체 영역 래퍼
+export const FormWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
+`;
+
+// 입력창 그룹
+export const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 12px;
+`;
+
+// 버튼 그룹 (가로 배치)
+export const ButtonGroup = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 10px;
   padding-inline: 20px;
-  gap: 16px;
-  align-items: center;
 `;
