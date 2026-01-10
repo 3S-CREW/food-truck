@@ -15,15 +15,15 @@ const EntryPage = () => {
       {/* 상단 ~ 중앙 콘텐츠 영역 */}
       <PageHeader
         title={`우리 동네\n푸드트럭`}
-        subtitle="토스로 로그인 할게요"
+        subtitle='토스로 로그인 할게요'
       />
 
       {/* 하단 버튼 영역 */}
       <S.ButtonWrapper>
-        <Button color="primary" variant="fill" style={{ width: '100%' }}>
+        <Button color='primary' variant='fill' style={{ width: '100%' }}>
           토스로 시작하기
         </Button>
-        <TextButton size="medium" type="button" onClick={handleAdminLoginClick}>
+        <TextButton size='medium' type='button' onClick={handleAdminLoginClick}>
           관리자 로그인
         </TextButton>
       </S.ButtonWrapper>
