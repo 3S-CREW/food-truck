@@ -1,9 +1,16 @@
+import { PRIVACY_POLICY_TABLE, TERMS_OF_SERVICE } from '@/constants/terms';
 import * as S from '@/pages/Terms/style';
 import { colors } from '@toss/tds-colors';
-import { Button, Text, TableRow } from '@toss/tds-mobile';
-import { TERMS_OF_SERVICE, PRIVACY_POLICY_TABLE } from '@/constants/terms';
+import { Button, TableRow, Text } from '@toss/tds-mobile';
+import { useNavigate } from 'react-router-dom';
 
 const TermsPage = () => {
+  const navigate = useNavigate();
+
+  const handleBackPageClick = () => {
+    navigate(-1);
+  };
+
   return (
     <S.Container>
       <S.ContentWrapper>
@@ -71,7 +78,11 @@ const TermsPage = () => {
             <Text typography='t4' fontWeight='bold'>
               {TERMS_OF_SERVICE.SECOND_AGREE_TITLE}
             </Text>
-            <Text typography='t5' color={colors.grey700} style={{ lineHeight: '1.5' }}>
+            <Text
+              typography='t5'
+              color={colors.grey700}
+              style={{ lineHeight: '1.5' }}
+            >
               {TERMS_OF_SERVICE.PRESERVATION_OF_PERSONAL_INFORMATION_TEXT}
             </Text>
           </S.SectionGroup>
@@ -79,7 +90,12 @@ const TermsPage = () => {
       </S.ContentWrapper>
 
       {/* 하단 버튼 */}
-      <Button color='primary' variant='fill' style={{ width: '100%' }}>
+      <Button
+        color='primary'
+        variant='fill'
+        style={{ width: '100%' }}
+        onClick={handleBackPageClick}
+      >
         닫기
       </Button>
     </S.Container>
