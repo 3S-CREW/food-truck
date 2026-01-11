@@ -1,82 +1,12 @@
 import DashboardStats from '@/components/layout/DashBoardStats';
 import DashboardTabs from '@/components/layout/DashBoardTabs';
-import type { FoodTruckData } from '@/components/layout/FoodTruckCard';
-import FoodTruckCard from '@/components/layout/FoodTruckCard';
 import NoticeBar from '@/components/layout/NoticeBar';
-import ReportCard, { type ReportData } from '@/components/layout/ReportCard';
+import DashboardList from '@/components/layout/DashBoardList';
 import * as S from '@/pages/AdminDashBoard/style';
 import { colors } from '@toss/tds-colors';
 import { Text, TextButton } from '@toss/tds-mobile';
 import { useState } from 'react';
-
-// mock 데이터 (추후에 API로 받아올때 제거)
-const STATS_DATA = [
-  { label: '총 신고', count: 3, color: colors.blue700, bgColor: colors.blue50 },
-  {
-    label: '미처리',
-    count: 2,
-    color: colors.orange400,
-    bgColor: colors.orange50,
-  },
-  { label: '처리', count: 1, color: colors.green400, bgColor: colors.green50 },
-];
-
-const REPORT_LIST: ReportData[] = [
-  {
-    id: 1,
-    truckName: '한식 트럭',
-    reportType: '리뷰 신고',
-    status: 'exposed',
-    content: '음식이 ** 맛없어요',
-    reason: '욕설 포함',
-    reporter: '닉네임A',
-    date: '2024-12-23',
-  },
-  {
-    id: 2,
-    truckName: '타코야끼 천국',
-    reportType: '푸드트럭 신고',
-    status: 'exposed',
-    content: '위생 상태가 불량함',
-    reason: '음식 품질 불량',
-    reporter: '닉네임B',
-    date: '2024-12-22',
-  },
-  {
-    id: 3,
-    truckName: '핫도그 마을',
-    reportType: '푸드트럭 신고',
-    status: 'hidden',
-    content: '먹고 배탈났어요',
-    reason: '음식 품질 불량',
-    reporter: '신고자C',
-    date: '2024-12-21',
-  },
-];
-
-const FOOD_TRUCK_LIST: FoodTruckData[] = [
-  {
-    id: 1,
-    name: '한식 트럭',
-    category: '한식',
-    reportCount: 0,
-    status: 'exposed',
-  },
-  {
-    id: 2,
-    name: '타코야끼 천국',
-    category: '일식',
-    reportCount: 1,
-    status: 'exposed',
-  },
-  {
-    id: 3,
-    name: '핫도그 마을',
-    category: '양식',
-    reportCount: 2,
-    status: 'hidden',
-  },
-];
+import { STATS_DATA, REPORT_LIST, FOOD_TRUCK_LIST } from '@/constants/mockData';
 
 const AdminDashBoardPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -101,13 +31,11 @@ const AdminDashBoardPage = () => {
 
       {/* 리스트 영역 */}
       <S.ListContainer>
-        {selectedTab === 0 ? REPORT_LIST.map((report) => (
-          <ReportCard key={report.id} data={report} />
-        )) : (
-          FOOD_TRUCK_LIST.map((truck) => (
-            <FoodTruckCard key={truck.id} data={truck} />
-          ))
-        )}
+        <DashboardList 
+          selectedTab={selectedTab}
+          reportList={REPORT_LIST}
+          foodTruckList={FOOD_TRUCK_LIST}
+        />
       </S.ListContainer>
 
       {/* 하단 안내 문구 */}
