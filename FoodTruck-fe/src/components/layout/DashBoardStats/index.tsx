@@ -1,4 +1,3 @@
-// components/DashboardStats.tsx
 import * as S from '@/components/layout/DashBoardStats/style'
 import { Text } from '@toss/tds-mobile';
 import { colors } from '@toss/tds-colors';

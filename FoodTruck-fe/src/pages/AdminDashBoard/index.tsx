@@ -1,3 +1,5 @@
+import DashboardStats from '@/components/layout/DashBoardStats';
+import DashboardTabs from '@/components/layout/DashBoardTabs';
 import * as S from '@/pages/AdminDashBoard/style';
 import { colors } from '@toss/tds-colors';
 import {
@@ -5,22 +7,25 @@ import {
   Button,
   ListRow,
   Paragraph,
-  Tab,
   Text,
   TextButton,
 } from '@toss/tds-mobile';
 import { useState, type CSSProperties } from 'react';
-import DashboardStats from '@/components/layout/DashBoardStats';
 
 // mock 데이터 (추후에 API로 받아올때 제거)
 const STATS_DATA = [
   { label: '총 신고', count: 3, color: colors.blue700, bgColor: colors.blue50 },
-  { label: '미처리', count: 2, color: colors.orange400, bgColor: colors.orange50 },
+  {
+    label: '미처리',
+    count: 2,
+    color: colors.orange400,
+    bgColor: colors.orange50,
+  },
   { label: '처리', count: 1, color: colors.green400, bgColor: colors.green50 },
 ];
 
 const AdminDashBoardPage = () => {
-  const [selected, setSelected] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(0);
 
   return (
     <S.Container>
@@ -38,11 +43,8 @@ const AdminDashBoardPage = () => {
       <DashboardStats stats={STATS_DATA} />
 
       {/* 탭 */}
-      <Tab size='large' onChange={(index) => setSelected(index)}>
-        <Tab.Item selected={selected === 0}>신고 관리</Tab.Item>
-        <Tab.Item selected={selected === 1}>푸드트럭 목록</Tab.Item>
-      </Tab>
-
+      <DashboardTabs selected={selectedTab} onChange={setSelectedTab} />
+      
       {/* 리스트 영역 */}
       <S.ListContainer>
         <S.ReportCard isHighlighted={true}>
@@ -246,7 +248,7 @@ const AdminDashBoardPage = () => {
             typography='t6'
             color={colors.blue700}
             fontWeight='medium'
-            style={{ paddingLeft: '8px'}}
+            style={{ paddingLeft: '8px' }}
           >
             숨김 처리 시 사용자에게 즉시 비노출됩니다.
           </Paragraph.Text>
