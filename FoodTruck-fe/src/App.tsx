@@ -4,6 +4,7 @@ import AdminLoginPage from '@/pages/AdminLogin';
 import TermsPage from '@/pages/Terms';
 import AdminDashBoardPage from '@/pages/AdminDashBoard';
 import TempEntryPage from '@/pages/TempEntry';
+import UserHomePage from '@/pages/UserHome';
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path='/admin/login' element={<AdminLoginPage />} />
         <Route path='/admin/dashboard' element={<AdminDashBoardPage />} />
         <Route path='/login/terms' element={<TermsPage />} />
+        <Route path='/user/home' element={<UserHomePage />} />
 
         {/* 없는 페이지 처리 */}
         <Route path='*' element={<Navigate to='/entry' replace />} />
