@@ -1,6 +1,6 @@
 import * as S from '@/components/layout/ReportCard/style';
 import { colors } from '@toss/tds-colors';
-import { Badge, Button, ListRow, Text } from '@toss/tds-mobile';
+import { Badge, Button, ListRow, Paragraph, Text } from '@toss/tds-mobile';
 import { type CSSProperties } from 'react';
 
 export interface ReportData {
@@ -82,9 +82,14 @@ const ReportCard = ({ data }: Props) => {
             } as CSSProperties
           }
         >
-          <Text typography="t6" color={colors.whiteOpacity900}>
-            {isExposed ? '숨김' : '복구'}
-          </Text>
+        <Paragraph typography='t5' color={colors.white}>
+          <Paragraph.Icon
+            name={isExposed ? 'icon-eye-off-mono' : 'icon-eye-on-mono'}
+            color={colors.white}
+            style={{ marginRight: 8 }}
+          />
+          {isExposed ? '숨김' : '복구' }
+        </Paragraph>
         </Button>
         <Button
           size="medium"
