@@ -74,7 +74,7 @@ const FoodTruckCard = ({ data }: Props) => {
           <Paragraph.Icon
             name={isHidden ? 'icon-eye-on-mono' : 'icon-eye-off-mono'}
             color={colors.white}
-            style={{ marginRight: 4 }}
+            style={{ marginRight: 8 }}
           />
           {isHidden ? '복구' : '숨김'}
         </Paragraph>
