@@ -1,0 +1,66 @@
+import { colors } from '@toss/tds-colors';
+import { type FoodTruckData } from '@/components/layout/FoodTruckCard';
+import { type ReportData } from '@/components/layout/ReportCard';
+
+export const STATS_DATA = [
+  { label: '총 신고', count: 3, color: colors.blue700, bgColor: colors.blue50 },
+  { label: '미처리', count: 2, color: colors.orange400, bgColor: colors.orange50 },
+  { label: '처리', count: 1, color: colors.green400, bgColor: colors.green50 },
+];
+
+export const REPORT_LIST: ReportData[] = [
+  {
+    id: 1,
+    truckName: '한식 트럭',
+    reportType: '리뷰 신고',
+    status: 'exposed',
+    content: '음식이 ** 맛없어요',
+    reason: '욕설 포함',
+    reporter: '닉네임A',
+    date: '2024-12-23',
+  },
+  {
+    id: 2,
+    truckName: '타코야끼 천국',
+    reportType: '푸드트럭 신고',
+    status: 'exposed',
+    content: '위생 상태가 불량함',
+    reason: '음식 품질 불량',
+    reporter: '닉네임B',
+    date: '2024-12-22',
+  },
+  {
+    id: 3,
+    truckName: '핫도그 마을',
+    reportType: '푸드트럭 신고',
+    status: 'hidden',
+    content: '먹고 배탈났어요',
+    reason: '음식 품질 불량',
+    reporter: '신고자C',
+    date: '2024-12-21',
+  },
+];
+
+export const FOOD_TRUCK_LIST: FoodTruckData[] = [
+  {
+    id: 1,
+    name: '한식 트럭',
+    category: '한식',
+    reportCount: 0,
+    status: 'exposed',
+  },
+  {
+    id: 2,
+    name: '타코야끼 천국',
+    category: '일식',
+    reportCount: 1,
+    status: 'exposed',
+  },
+  {
+    id: 3,
+    name: '핫도그 마을',
+    category: '양식',
+    reportCount: 2,
+    status: 'hidden',
+  },
+];
