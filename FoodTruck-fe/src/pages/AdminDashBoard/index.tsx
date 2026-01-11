@@ -1,5 +1,7 @@
 import DashboardStats from '@/components/layout/DashBoardStats';
 import DashboardTabs from '@/components/layout/DashBoardTabs';
+import type { FoodTruckData } from '@/components/layout/FoodTruckCard';
+import FoodTruckCard from '@/components/layout/FoodTruckCard';
 import NoticeBar from '@/components/layout/NoticeBar';
 import ReportCard, { type ReportData } from '@/components/layout/ReportCard';
 import * as S from '@/pages/AdminDashBoard/style';
@@ -52,6 +54,30 @@ const REPORT_LIST: ReportData[] = [
   },
 ];
 
+const FOOD_TRUCK_LIST: FoodTruckData[] = [
+  {
+    id: 1,
+    name: '한식 트럭',
+    category: '한식',
+    reportCount: 0,
+    status: 'exposed',
+  },
+  {
+    id: 2,
+    name: '타코야끼 천국',
+    category: '일식',
+    reportCount: 1,
+    status: 'exposed',
+  },
+  {
+    id: 3,
+    name: '핫도그 마을',
+    category: '양식',
+    reportCount: 2,
+    status: 'hidden',
+  },
+];
+
 const AdminDashBoardPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -75,9 +101,13 @@ const AdminDashBoardPage = () => {
 
       {/* 리스트 영역 */}
       <S.ListContainer>
-        {REPORT_LIST.map((report) => (
+        {selectedTab === 0 ? REPORT_LIST.map((report) => (
           <ReportCard key={report.id} data={report} />
-        ))}
+        )) : (
+          FOOD_TRUCK_LIST.map((truck) => (
+            <FoodTruckCard key={truck.id} data={truck} />
+          ))
+        )}
       </S.ListContainer>
 
       {/* 하단 안내 문구 */}
