@@ -10,6 +10,14 @@ import {
   TextButton,
 } from '@toss/tds-mobile';
 import { useState, type CSSProperties } from 'react';
+import DashboardStats from '@/components/layout/DashBoardStats';
+
+// mock 데이터 (추후에 API로 받아올때 제거)
+const STATS_DATA = [
+  { label: '총 신고', count: 3, color: colors.blue700, bgColor: colors.blue50 },
+  { label: '미처리', count: 2, color: colors.orange400, bgColor: colors.orange50 },
+  { label: '처리', count: 1, color: colors.green400, bgColor: colors.green50 },
+];
 
 const AdminDashBoardPage = () => {
   const [selected, setSelected] = useState(0);
@@ -27,32 +35,7 @@ const AdminDashBoardPage = () => {
       </S.Header>
 
       {/* 상단 통계 카드 */}
-      <S.StatsGrid>
-        <S.StatCard bgColor={colors.blue50}>
-          <Text typography='t6' color={colors.grey700}>
-            총 신고
-          </Text>
-          <Text typography='t3' fontWeight='bold' color={colors.blue700}>
-            3
-          </Text>
-        </S.StatCard>
-        <S.StatCard bgColor={colors.orange50}>
-          <Text typography='t6' color={colors.grey700}>
-            미처리
-          </Text>
-          <Text typography='t3' fontWeight='bold' color={colors.orange400}>
-            2
-          </Text>
-        </S.StatCard>
-        <S.StatCard bgColor={colors.green50}>
-          <Text typography='t6' color={colors.grey700}>
-            처리
-          </Text>
-          <Text typography='t3' fontWeight='bold' color={colors.green400}>
-            1
-          </Text>
-        </S.StatCard>
-      </S.StatsGrid>
+      <DashboardStats stats={STATS_DATA} />
 
       {/* 탭 */}
       <Tab size='large' onChange={(index) => setSelected(index)}>
