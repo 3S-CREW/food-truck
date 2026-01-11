@@ -4,7 +4,7 @@ import NoticeBar from '@/components/layout/NoticeBar';
 import ReportCard, { type ReportData } from '@/components/layout/ReportCard';
 import * as S from '@/pages/AdminDashBoard/style';
 import { colors } from '@toss/tds-colors';
-import { Paragraph, Text, TextButton } from '@toss/tds-mobile';
+import { Text, TextButton } from '@toss/tds-mobile';
 import { useState } from 'react';
 
 // mock 데이터 (추후에 API로 받아올때 제거)

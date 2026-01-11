@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import { colors } from '@toss/tds-colors';
 
 export const Container = styled.div`
   display: flex;
