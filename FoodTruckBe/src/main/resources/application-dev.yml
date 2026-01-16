@@ -49,12 +49,10 @@ spring:
         auto: false
 
 toss:
-  client-id: ${TOSS_CLIENT_ID}         # 환경변수 처리
-  client-secret: ${TOSS_CLIENT_SECRET} # 환경변수 처리
   cert:
-    path: "classpath:toss_cert.p12" # resources 폴더에 파일이 있어야 함
-    password: ${TOSS_CERT_PASSWORD} # 인증서 비밀번호도 환경변수 권장
-    type: "PKCS12"
+    path: "classpath:toss_cert.p12" # resources 폴더 내 파일명
+    password: ${TOSS_CERT_PASSWORD}  # 인증서 비밀번호
+    type: "PKCS12"                  # 파일 확장자가 .p12면 PKCS12
   url:
     token: "https://api.toss.im/api-partner/v1/apps-in-toss/user/oauth2/generate-token"
     profile: "https://api.toss.im/api-partner/v1/apps-in-toss/user/oauth2/login-me"
