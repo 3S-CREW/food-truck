@@ -1,29 +1,35 @@
-# docker-compose.dev.yml
-
 version: '3.8'
 
 services:
-  # 1. Spring Boot Application
   backend:
     container_name: foodtruck-backend
-    image: ${DOCKER_USERNAME}/foodtruck-be:dev  # GitHub Actions에서 빌드한 이미지
+    image: ${DOCKER_USERNAME}/foodtruck-be:dev
     restart: always
     ports:
-      - "80:8080"  # 외부 80포트 -> 내부 8080포트 연결 (http://IP 로 접속 가능)
+      - "80:8080"
     environment:
+      # 스프링 부트 설정
       - SPRING_PROFILES_ACTIVE=dev
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/foodtruck_db?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+      - TZ=Asia/Seoul
+
+      # DB 및 Redis 접속 정보 (.env에서 가져옴)
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD} # .env 또는 실행 시 주입
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/foodtruck_db?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
+
+      # 시크릿 키 (.env에서 가져옴)
+      - jwt.secret=${JWT_SECRET_KEY}
+      - toss.client-id=${TOSS_CLIENT_ID}
+      - toss.client-secret=${TOSS_CLIENT_SECRET}
+
     depends_on:
       - mysql
       - redis
     networks:
       - foodtruck-network
 
-  # 2. Redis
   redis:
     image: redis:latest
     container_name: foodtruck-redis
@@ -32,7 +38,6 @@ services:
     networks:
       - foodtruck-network
 
-  # 3. MySQL
   mysql:
     image: mysql:8.0
     container_name: foodtruck-mysql
@@ -42,10 +47,10 @@ services:
       MYSQL_DATABASE: foodtruck_db
       TZ: Asia/Seoul
     ports:
-      - "3306:3306" # 개발 편의상 외부 접속 허용 (보안 중요시 제거)
+      - "3306:3306"
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ./db/data:/var/lib/mysql # EC2 내부에 데이터 영구 저장
+      - ./db/data:/var/lib/mysql
     networks:
       - foodtruck-network
 

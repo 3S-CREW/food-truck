@@ -2,13 +2,12 @@ name: Backend Dev Deploy
 
 on:
   push:
-    branches: [ "backend" ] # backend 브랜치 푸시 시 동작
+    branches: [ "backend" ]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    # [수정 1] 모든 'run' 명령어(쉘 스크립트)가 실행될 기본 폴더를 지정합니다.
     defaults:
       run:
         working-directory: ./FoodTruckBe
@@ -17,43 +16,46 @@ jobs:
       contents: read
 
     steps:
-      # 1. 코드 체크아웃 (이건 전체 레포지토리를 가져옵니다)
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. JDK 17 설치
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Gradle 빌드
-      # (위의 defaults 설정 덕분에 자동으로 FoodTruckBe 폴더 안에서 실행됩니다)
       - name: Build with Gradle
         run: |
           chmod +x gradlew
           ./gradlew build -x test
 
-      # 4. Docker Hub 로그인
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 5. Docker 이미지 빌드 및 푸시
-      # [수정 2] 도커 액션은 defaults 설정을 따르지 않으므로 직접 경로를 지정해야 합니다.
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
-          context: ./FoodTruckBe        # 도커 빌드 컨텍스트 (백엔드 폴더)
-          file: ./FoodTruckBe/Dockerfile # 도커파일 위치
+          context: ./FoodTruckBe
+          file: ./FoodTruckBe/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/foodtruck-be:dev
 
-      # 6. EC2에 배포 (이 부분은 기존과 동일)
-      # EC2 내부에서는 이미 만들어진 이미지를 다운받아 실행하므로 경로 수정 불필요
+      # [변경] docker-compose.dev.yml 파일을 EC2로 전송 (SCP)
+      - name: Copy Docker Compose file to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "./FoodTruckBe/docker-compose.dev.yml"
+          target: "~/foodtruck-server/"
+          strip_components: 1 # FoodTruckBe 폴더 껍데기 제거하고 내용물만 전송
+
+      # [변경] EC2에서 .env 파일 생성 후 배포 실행
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -61,64 +63,20 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            mkdir -p ~/foodtruck-server/db/data
             cd ~/foodtruck-server
 
-            cat > docker-compose.dev.yml <<EOF
-            version: '3.8'
-            services:
-              backend:
-                container_name: foodtruck-backend
-                image: ${{ secrets.DOCKER_USERNAME }}/foodtruck-be:dev
-                restart: always
-                ports:
-                  - "80:8080"
-                environment:
-                  - SPRING_PROFILES_ACTIVE=dev
-                  - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/foodtruck_db?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-                  - SPRING_DATASOURCE_USERNAME=root
-                  - SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
-                  - SPRING_REDIS_HOST=redis
-                  - SPRING_REDIS_PORT=6379
-                depends_on:
-                  - mysql
-                  - redis
-                networks:
-                  - foodtruck-network
-
-              redis:
-                image: redis:latest
-                container_name: foodtruck-redis
-                restart: always
-                command: redis-server --appendonly yes
-                networks:
-                  - foodtruck-network
-
-              mysql:
-                image: mysql:8.0
-                container_name: foodtruck-mysql
-                restart: always
-                environment:
-                  MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
-                  MYSQL_DATABASE: foodtruck_db
-                  TZ: Asia/Seoul
-                ports:
-                  - "3306:3306"
-                command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-                volumes:
-                  - ./db/data:/var/lib/mysql
-                networks:
-                  - foodtruck-network
-
-            networks:
-              foodtruck-network:
-                driver: bridge
-            EOF
-
-            docker pull ${{ secrets.DOCKER_USERNAME }}/foodtruck-be:dev
+          
+            echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" > .env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+            echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
+            echo "TOSS_CLIENT_ID=${{ secrets.TOSS_CLIENT_ID }}" >> .env
+            echo "TOSS_CLIENT_SECRET=${{ secrets.TOSS_CLIENT_SECRET }}" >> .env
+            echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
+            echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> .env
+            echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> .env
+            echo "TOSS_CERT_PASSWORD=${{ secrets.TOSS_CERT_PASSWORD }}" >> .env
             
-            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            docker pull ${{ secrets.DOCKER_USERNAME }}/foodtruck-be:dev
             
             docker-compose -f docker-compose.dev.yml down
             docker-compose -f docker-compose.dev.yml up -d
