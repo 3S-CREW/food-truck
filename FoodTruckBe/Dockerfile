@@ -1,6 +1,10 @@
 # 1. Base Image: Java 17 (Eclipse Temurin - 성능과 안정성이 입증된 JDK)
 FROM eclipse-temurin:17-jdk
 
+# 타임존 설정 (한국 시간)
+ENV TZ=Asia/Seoul
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # 2. 작업 디렉토리 설정
 WORKDIR /app
 
@@ -12,4 +16,4 @@ COPY build/libs/*.jar app.jar
 EXPOSE 8080
 
 # 5. 실행 명령어
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "-Duser.timezone=Asia/Seoul", "app.jar"]
