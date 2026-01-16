@@ -7,8 +7,8 @@ import com.toss.foodtruck.domain.member.entity.Member;
 import com.toss.foodtruck.domain.member.repository.MemberRepository;
 import com.toss.foodtruck.global.enums.Role;
 import com.toss.foodtruck.global.jwt.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
@@ -23,18 +23,14 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class AuthService {
+
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
+
+    // mTLS 인증서가 설정된 RestTemplate
     private final RestTemplate restTemplate;
-
-    @Value("${toss.client-id}")
-    private String tossClientId;
-
-    @Value("${toss.client-secret}")
-    private String tossClientSecret;
 
     @Value("${toss.url.token}")
     private String tossTokenUrl;
@@ -42,26 +38,33 @@ public class AuthService {
     @Value("${toss.url.profile}")
     private String tossProfileUrl;
 
-    // 실제 로그인 로직
+    // [중요] 생성자 주입을 명시적으로 작성해야 @Qualifier를 쓸 수 있습니다.
+    // (Lombok @RequiredArgsConstructor로는 @Qualifier 지정이 어렵습니다)
+    public AuthService(MemberRepository memberRepository,
+                       JwtTokenProvider jwtTokenProvider,
+                       RedisTemplate<String, Object> redisTemplate,
+                       @Qualifier("tossRestTemplate") RestTemplate restTemplate) {
+        this.memberRepository = memberRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.redisTemplate = redisTemplate;
+        this.restTemplate = restTemplate;
+    }
+
     @Transactional
     public TokenResponseDto login(LoginRequestDto request) {
+        // [수정] DTO에서 referrer도 같이 받아야 함
+        TossResponseDto.UserProfile tossUser = getTossUserInfo(request.getAuthCode(), request.getReferrer());
 
-        // 1. 토스 API 연동 (AuthCode -> Token -> UserInfo)
-        TossResponseDto.UserProfile tossUser = getTossUserInfo(request.getAuthCode());
-        log.info("토스 유저 정보 가져오기 성공: accountId={}", tossUser.getAccountId());
+        log.info("토스 로그인 성공: accountId={}", tossUser.getAccountId());
 
-        // 2. DB 조회 및 회원가입/로그인 처리
         Member member = memberRepository.findByAccountId(tossUser.getAccountId())
                                         .orElseGet(() -> signup(tossUser));
 
-        // 정보 업데이트 (이름, 전화번호 등 변경되었을 수 있음)
         member.updateInfo(tossUser.getName(), tossUser.getPhoneNumber());
 
-        // 3. 우리 서버 전용 JWT 토큰 발급
         String accessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
 
-        // 4. Redis에 Refresh Token 저장
         redisTemplate.opsForValue()
                      .set("RT:" + member.getId(), refreshToken,
                          jwtTokenProvider.getRefreshTokenValidityInMilliseconds(), TimeUnit.MILLISECONDS);
@@ -74,53 +77,38 @@ public class AuthService {
                                .build();
     }
 
-    // 신규 회원가입 로직
     private Member signup(TossResponseDto.UserProfile tossUser) {
-        Member newMember = Member.builder()
-                                 .accountId(tossUser.getAccountId())
-                                 .name(tossUser.getName())
-                                 .phoneNumber(tossUser.getPhoneNumber())
-                                 .ci(tossUser.getCi())
-                                 .role(Role.USER) // 초기 권한 USER
-                                 .build();
-        return memberRepository.save(newMember);
+        return memberRepository.save(Member.builder()
+                                           .accountId(tossUser.getAccountId())
+                                           .name(tossUser.getName())
+                                           .phoneNumber(tossUser.getPhoneNumber())
+                                           .ci(tossUser.getCi())
+                                           .role(Role.USER)
+                                           .build());
     }
 
-    // [중요] 토스 API 연동 부분 (현재는 테스트용 Mock)
-    // 나중에 여기에 RestTemplate + mTLS 로직을 넣어야 합니다.
-//    private TossUserInfo getTossUserInfo(String authCode) {
-//        log.info("Toss Server로 authCode 전송: {}", authCode);
-//
-//        // TODO: 실제 토스 API 호출로 대체 예정
-//        // 지금은 "임의의 유저"가 로그인했다고 가정합니다.
-//        return new TossUserInfo(
-//            "toss-id-" + UUID.randomUUID().toString().substring(0, 8), // 가짜 accountId
-//            "테스트유저",
-//            "010-1234-5678"
-//        );
-//    }
-    private TossResponseDto.UserProfile getTossUserInfo(String authCode) {
-        // A. 토큰 발급 요청 (generate-token)
-        String tossAccessToken = requestTossAccessToken(authCode);
-
-        // B. 유저 정보 요청 (login-me)
+    private TossResponseDto.UserProfile getTossUserInfo(String authCode, String referrer) {
+        // A. 토큰 발급 (mTLS 통신)
+        String tossAccessToken = requestTossAccessToken(authCode, referrer);
+        // B. 정보 조회 (mTLS 통신)
         return requestTossUserProfile(tossAccessToken);
     }
 
-    // A. 토큰 발급 (POST /generate-token)
-    private String requestTossAccessToken(String authCode) {
+    // URL: /api-partner/v1/apps-in-toss/user/oauth2/generate-token
+    private String requestTossAccessToken(String authCode, String referrer) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON); // 최신 API는 보통 JSON 사용
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Body 생성
         Map<String, String> body = new HashMap<>();
-        body.put("authorizationCode", authCode); // 다이어그램 용어: 인가 코드
-        body.put("client_id", tossClientId);     // 필요한 경우
-        body.put("client_secret", tossClientSecret); // 필요한 경우
+        body.put("authorizationCode", authCode);
+
+        // [수정] 프론트에서 받은 referrer 값 사용 (없으면 빈 문자열이라도 보내야 함)
+        body.put("referrer", referrer != null ? referrer : "");
 
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
         try {
+            // 여기서 사용하는 restTemplate은 TossConfig에서 만든 '인증서 탑재된' 녀석입니다.
             ResponseEntity<TossResponseDto.Token> response = restTemplate.postForEntity(
                 tossTokenUrl, request, TossResponseDto.Token.class);
 
@@ -132,22 +120,19 @@ public class AuthService {
         }
     }
 
-    // B. 유저 정보 조회 (GET /login-me)
     private TossResponseDto.UserProfile requestTossUserProfile(String tossAccessToken) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(tossAccessToken); // Authorization: Bearer {token}
+        headers.setBearerAuth(tossAccessToken);
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
         try {
-            // GET 요청은 exchange 메서드 사용
             ResponseEntity<TossResponseDto.UserProfile> response = restTemplate.exchange(
                 tossProfileUrl,
                 HttpMethod.GET,
                 request,
                 TossResponseDto.UserProfile.class
             );
-
             return response.getBody();
 
         } catch (HttpClientErrorException e) {
@@ -155,7 +140,4 @@ public class AuthService {
             throw new RuntimeException("토스 로그인 실패 (정보 조회)");
         }
     }
-
-    // 내부에서만 쓸 DTO (토스에서 받아온 정보 묶음)
-    private record TossUserInfo(String accountId, String name, String phoneNumber) {}
 }
