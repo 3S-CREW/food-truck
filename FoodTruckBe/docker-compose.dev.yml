@@ -20,7 +20,7 @@ services:
       - SPRING_REDIS_PORT=6379
 
       # 시크릿 키 (.env에서 가져옴)
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET_KEY}
 
       - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
