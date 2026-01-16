@@ -65,8 +65,12 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             cd ~/foodtruck-server
-
-            cat > /env <<EOF
+            
+            if [ -f "./FoodTruckBe/docker-compose.dev.yml" ]; then
+              mv -f ./FoodTruckBe/docker-compose.dev.yml ./docker-compose.dev.yml
+            fi
+            
+            cat > .env <<EOF
             DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
