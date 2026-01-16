@@ -63,5 +63,4 @@ logging:
 
 # JWT
 jwt:
-  secret: ${JWT_SECRET_KEY} # 환경변수 처리
   token-validity-in-seconds: 3600
