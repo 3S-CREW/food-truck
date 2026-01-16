@@ -3,6 +3,7 @@ name: Backend Dev Deploy
 on:
   push:
     branches: [ "backend" ]
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
